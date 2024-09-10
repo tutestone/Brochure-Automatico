@@ -3,15 +3,16 @@ Explicación Actualizada del Proyecto: Catálogo de Productos con Filtrado y Gen
 Visión General:
 Este proyecto es una aplicación web interactiva que permite a los usuarios filtrar productos y generar un catálogo personalizado en PDF basado en sus selecciones.
 Estructura y Funcionalidad:
-
+//
 2.1 HTML y CSS:
 
 La página incluye un encabezado fijo con el título "CATÁLOGO DE PRODUCTOS".
 Se implementan 10 filtros personalizables, cada uno como un elemento <select>.
 Dos filtros (FILTRO 4 y FILTRO 7) incluyen tooltips informativos.
 Se utilizan estilos CSS para crear un diseño responsive y atractivo.
-
+//
 2.2 JavaScript:
+
 a) Datos y Estructuras:
 
 products: Objeto que contiene productos y su disponibilidad basada en 28 criterios.
@@ -41,7 +42,7 @@ Tooltips informativos para ciertos filtros.
 Generación de PDF personalizado basado en la selección del usuario.
 Diseño responsive que se adapta a diferentes tamaños de pantalla.
 
-
+//
 Mejoras y Particularidades:
 
 
@@ -49,13 +50,13 @@ Se incluye siempre la primera y la última diapositiva (7) en el PDF generado.
 El sistema de filtrado es flexible y puede adaptarse fácilmente a diferentes criterios.
 Se implementa manejo de errores y feedback visual durante la generación del PDF.
 
-
+//
 Consideraciones Técnicas:
 
 
 Utiliza bibliotecas externas como pdf.js y jsPDF para el manejo de PDFs.
 El código está estructurado para facilitar futuras modificaciones o expansiones.
-
+//
 
 Uso y Flujo de Trabajo:
 El usuario selecciona criterios en los filtros.
