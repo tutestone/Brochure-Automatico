@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CATÁLOGO DE PRODUCTOS</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.9.359/pdf.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        body {
+           font-family: 'Arial', sans-serif;
+           line-height: 1.4;
+           color: #333;
+           margin: 0;
+           padding: 0;
+           background-color: #f2fcf3
+           ;
+       }
+   
+       .header {
+           position: fixed;
+           top: 0;
+           left: 0;
+           right: 0;
+           background-color: #fff;
+           box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+           z-index: 1000;
+           padding: 10px 20px;
+       }
+   
+       h1 {
+           text-align: center;
+           color: #2c3e50;
+           margin: 10px 0;
+           font-size: 24px;
+       }
+   
+       .filter-container {
+               display: flex;
+               flex-wrap: wrap;
+               gap: 10px;
+               justify-content: center;
+               align-items: flex-start;
+               margin-bottom: 10px;
+           }
+   
+           .filter-group {
+               display: flex;
+               flex-direction: column;
+               align-items: flex-start;
+               margin-bottom: 10px;
+               position: relative;
+           }
+   
+           .filter-label {
+               display: flex;
+               align-items: center;
+               margin-bottom: 5px;
+               font-weight: normal;
+           }
+   
+           .filter-select {
+               width: 100%;
+               padding: 5px;
+               border: 1px solid #ddd;
+               border-radius: 4px;
+               background-color: #f4f0f0;
+               font-size: 14px;
+           }
+   
+           .info-icon {
+               display: inline-flex;
+               align-items: center;
+               justify-content: center;
+               width: 16px;
+               height: 16px;
+               background-color: #3498db;
+               color: white;
+               border-radius: 50%;
+               font-size: 12px;
+               margin-left: 5px;
+               cursor: help;
+           }
+   
+           .tooltip {
+               position: relative;
+               display: inline-block;
+           }
+   
+           .tooltip .tooltiptext {
+               visibility: hidden;
+               width: 300px;
+               max-height: 300px;
+               overflow-y: auto;
+               background-color: #555;
+               color: #fff;
+               text-align: left;
+               border-radius: 6px;
+               padding: 10px;
+               position: absolute;
+               z-index: 1000;
+               opacity: 0;
+               transition: opacity 0.3s, visibility 0.3s;
+               font-size: 12px;
+               line-height: 1.4;
+               box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+           }
+   
+           .tooltip:hover .tooltiptext {
+               visibility: visible;
+               opacity: 1;
+           }
+   
+           /* Estilos específicos para cada tooltip */
+           #tooltip-7983 .tooltiptext {
+               top: 100%;
+               left: -150px;
+           }
+   
+           #tooltip-adhesion .tooltiptext {
+               top: 100%;
+               right: -150px;
+           }
+   
+           /* Flechas para cada tooltip */
+           .tooltip .tooltiptext::before {
+               content: "";
+               position: absolute;
+               border-width: 5px;
+               border-style: solid;
+           }
+   
+           #tooltip-7983 .tooltiptext::before {
+               top: -10px;
+               left: 155px;
+               border-color: transparent transparent #555 transparent;
+           }
+   
+           #tooltip-adhesion .tooltiptext::before {
+               top: -10px;
+               right: 155px;
+               border-color: transparent transparent #555 transparent;
+           }
+   
+           /* Ajustes responsivos */
+           @media screen and (max-width: 768px) {
+               #tooltip-7983 .tooltiptext,
+               #tooltip-adhesion .tooltiptext {
+                   width: 250px;
+                   left: 50%;
+                   transform: translateX(-50%);
+                   right: auto;
+               }
+   
+               #tooltip-7983 .tooltiptext::before,
+               #tooltip-adhesion .tooltiptext::before {
+                   left: 50%;
+                   margin-left: -5px;
+               }
+      }
+       
+   
+       /* Ajuste para evitar que el tooltip se salga de la pantalla por la derecha */
+       .tooltip:nth-last-child(-n+2) .tooltiptext {
+           left: auto;
+           right: 0;
+       }
+   
+       .tooltip:nth-last-child(-n+2) .tooltiptext::before {
+           left: auto;
+           right: 10px;
+       }
+   
+   
+      
+       select {
+           flex: 1 1 calc(11.11% - 10px);
+           min-width: 100px;
+           max-width: 200px;
+           padding: 5px;
+           border: 1px solid #ddd;
+           border-radius: 4px;
+           background-color: #dddbe9; 
+           font-size: 14px;
+       }
+   
+       .button-container {
+           display: flex;
+           justify-content: center;
+           gap: 20px;
+           margin-top: 10px;
+           margin-bottom: 10px;
+       }
+   
+       button {
+           padding: 10px 20px;
+           background-color: #279D2E
+           ;
+           color: #fff;
+           border: none;
+           border-radius: 4px;
+           cursor: pointer;
+           transition: background-color 0.3s ease;
+           font-size: 16px;
+       }
+   
+       button:hover {
+           background-color: #2980b9;
+       }
+   
+       .main-content {
+           margin-top: 250px; /* Ajusta este valor según la altura de tu header */
+           padding: 20px;
+       }
+   
+       .product-grid {
+           display: flex;
+           flex-wrap: wrap;
+           gap: 10px;
+           justify-content: center;
+           max-width: 1200px;
+           margin: 0 auto;
+       }
+   
+       .product-card {
+           background-color: #ffffff;
+           border: 1px solid #ddd;
+           border-radius: 8px;
+           padding: 15px;
+           box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+           font-size: 14px;
+           display: flex;
+           align-items: center;
+           justify-content: center;
+           text-align: center;
+           height: 25px;
+           flex: 1 0 calc(20% - 20px);
+           min-width: 150px;
+           transition: transform 0.2s ease, box-shadow 0.2s ease;
+       }
+   
+       .product-card:hover {
+           transform: translateY(-2px);
+           box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+       }
+   
+       @media (max-width: 1200px) {
+           .product-card {
+               flex: 1 0 calc(25% - 20px);
+           }
+       }
+   
+       @media (max-width: 900px) {
+           .product-card {
+               flex: 1 0 calc(33.33% - 20px);
+           }
+           select {
+               flex: 1 1 calc(33.33% - 10px);
+           }
+       }
+   
+       @media (max-width: 600px) {
+           .product-card {
+               flex: 1 0 calc(50% - 20px);
+           }
+           select {
+               flex: 1 1 100%;
+           }
+           .header {
+               position: static;
+           }
+           .main-content {
+               margin-top: 20px;
+           }
+       }
+       </style>
+</head>
+<body>
+    <div class="header">
+        <h1>CATÁLOGO DE PRODUCTOS</h1>
+        <div id="filterContainer" class="filter-container">
+            <label for="filtro1">FILTRO 1</label>
+            <select id="filtro1" class="w-full p-2 border rounded">
+                <option value="">Seleccionar...</option>
+                <option value="OPCION1">OPCION 1</option>
+                <option value="OPCION2">OPCION 2</option>
+                <option value="OPCION3">OPCION 3</option>
+                <option value="OPCION4">OPCION 4</option>
+            </select>
+        
+            <label for="filtro2">FILTRO 2</label>
+            <select id="filtro2" class="w-full p-2 border rounded">
+                <option value="">Seleccionar...</option>
+                <option value="OPCION1">OPCION 1</option>
+                <option value="OPCION2">OPCION 2</option>
+                <option value="OPCION3">OPCION 3</option>
+                <option value="OPCION4">OPCION 4</option>
+                <option value="OPCION5">OPCION 5</option>
+            </select>
+        
+            <label for="filtro3">FILTRO 3</label>
+            <select id="filtro3" class="w-full p-2 border rounded">
+                <option value="">Seleccionar...</option>
+                <option value="OPCION1">OPCION 1</option>
+                <option value="OPCION2">OPCION 2</option>
+                <option value="OPCION3">OPCION 3</option>
+                <option value="OPCION4">OPCION 4</option>
+            </select>
+        
+            <div class="filter-group">
+                <label for="filtro4">FILTRO 4
+                    <span class="tooltip" id="tooltip-filtro4">
+                    <span class="info-icon">i</span>
+                    <span class="tooltiptext">
+                        Información sobre el Filtro 4
+                    </span>
+                    </span>
+                </label>
+            </div>
+            <select id="filtro4" class="w-full p-2 border rounded">
+                <option value="">Seleccionar...</option>
+                <option value="OPCION1">OPCION 1</option>
+                <option value="OPCION2">OPCION 2</option>
+            </select>
+        
+            <label for="filtro5">FILTRO 5</label>
+            <select id="filtro5" class="w-full p-2 border rounded">
+                <option value="">Seleccionar...</option>
+                <option value="SI">SI</option>
+                <option value="NO">NO</option>
+            </select>
+        
+            <label for="filtro6">FILTRO 6</label>
+            <select id="filtro6" class="w-full p-2 border rounded">
+                <option value="">Seleccionar...</option>
+                <option value="SI">SI</option>
+                <option value="NO">NO</option>
+            </select>
+        
+            <div class="filter-group">
+                <label for="filtro7">FILTRO 7
+                    <span class="tooltip" id="tooltip-filtro7">
+                    <span class="info-icon">i</span>
+                    <span class="tooltiptext">
+                        Información sobre el Filtro 7
+                    </span>
+                    </span>
+                </label>
+            </div>
+            <select id="filtro7">
+                <option value="">Seleccionar...</option>
+                <option value="SI">SI</option>
+                <option value="NO">NO</option>
+            </select>
+        
+            <label for="filtro8">FILTRO 8</label>
+            <select id="filtro8" class="w-full p-2 border rounded">
+                <option value="">Seleccionar...</option>
+                <option value="SI">SI</option>
+                <option value="NO">NO</option>
+            </select>
+        
+            <label for="filtro9">FILTRO 9</label>
+            <select id="filtro9" class="w-full p-2 border rounded">
+                <option value="">Seleccionar...</option>
+                <option value="OPCION1">OPCION 1</option>
+                <option value="OPCION2">OPCION 2</option>
+                <option value="OPCION3">OPCION 3</option>
+            </select>
+        
+            <label for="filtro10">FILTRO 10</label>
+            <select id="filtro10" class="w-full p-2 border rounded">
+                <option value="">Seleccionar...</option>
+                <option value="OPCION1">OPCION 1</option>
+                <option value="OPCION2">OPCION 2</option>
+            </select>
+        </div>
+        <div class="button-container">
+            <button id="resetFilters">Reiniciar Filtros</button>
+            <button id="generatePDF">Generar PDF</button>
+        </div>
+    </div>
+    <div class="main-content">
+        <div id="products" class="product-grid"></div>
+    </div>
+
+    <script>
+        // Definición de productos y su disponibilidad
+         // Cada producto es una clave en el objeto, y su valor es un array de 28 elementos (0 o 1)
+        // 0 indica que el producto no está disponible para esa combinación de filtros
+        // 1 indica que el producto está disponible
+        // Modifica esta estructura según tus productos y criterios de disponibilidad
+   const products = {
+    'PRODUCTO1': [0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1],
+    'PRODUCTO2': [1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1],
+    'PRODUCTO3': [1, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1],
+    'PRODUCTO4': [0, 0, 0, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1],
+    'PRODUCTO5': [0, 0, 0, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1],
+    'PRODUCTO6': [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1],
+    'PRODUCTO7': [0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+    'PRODUCTO8': [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+    'PRODUCTO9': [0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1],
+    'PRODUCTO10': [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1]
+};
+
+// Lista de IDs de los filtros en el HTML
+// Asegúrate de que estos IDs coincidan con los de tus elementos select en el HTML
+const filters = [
+    'filtro1', 'filtro2', 'filtro3', 'filtro4', 'filtro5', 'filtro6', 'filtro7',
+    'filtro8', 'filtro9', 'filtro10'
+];
+// Matriz de diapositivas para cada producto
+// Cada producto tiene un array de números que representan las diapositivas a incluir en el PDF
+// Modifica esto según las diapositivas que quieras incluir para cada producto
+const slideMatrix = {
+    'PRODUCTO1': [1],
+    'PRODUCTO2': [2],
+    'PRODUCTO3': [3],
+    'PRODUCTO4': [3],
+    'PRODUCTO5': [3],
+    'PRODUCTO6': [4],
+    'PRODUCTO7': [4],
+    'PRODUCTO8': [4],
+    'PRODUCTO9': [5, 6],
+    'PRODUCTO10': [5, 6]
+};
+
+// Función para obtener el índice del filtro seleccionado
+// Esta función mapea las opciones de cada filtro a índices en el array de disponibilidad de productos
+// Modifica el objeto indexMap según tus filtros y opciones
+function getFilterIndex(filterId) {
+    const indexMap = {
+        'filtro1': [0, 1, 2, 3],
+        'filtro2': [4, 5, 6, 7, 8],
+        'filtro3': [9, 10, 11, 12],
+        'filtro4': [13, 14],
+        'filtro5': [15, 16],
+        'filtro6': [17, 18],
+        'filtro7': [19, 20],
+        'filtro8': [21, 22],
+        'filtro9': [23, 24, 25],
+        'filtro10': [26, 27]
+    };
+    const select = document.getElementById(filterId);
+    const optionIndex = select.selectedIndex - 1;
+    return optionIndex >= 0 ? indexMap[filterId][optionIndex] : -1;
+}
+
+// Función para actualizar los productos mostrados según los filtros seleccionados
+function updateProducts() {
+    const productContainer = document.getElementById('products');
+    productContainer.innerHTML = '';
+
+    for (const [productName, availability] of Object.entries(products)) {
+        let isAvailable = true;
+        for (const filter of filters) {
+            const index = getFilterIndex(filter);
+            if (index !== -1 && availability[index] === 0) {
+                isAvailable = false;
+                break;
+            }
+        }
+
+        if (isAvailable) {
+            const productElement = document.createElement('div');
+            productElement.className = 'product-card';
+            productElement.textContent = productName;
+            productContainer.appendChild(productElement);
+        }
+    }
+}
+// Función para obtener la lista de productos disponibles según los filtros actuales
+function getAvailableProducts() {
+    const availableProducts = [];
+    for (const [productName, availability] of Object.entries(products)) {
+        let isAvailable = true;
+        for (const filter of filters) {
+            const index = getFilterIndex(filter);
+            if (index !== -1 && availability[index] === 0) {
+                isAvailable = false;
+                break;
+            }
+        }
+        if (isAvailable) {
+            availableProducts.push(productName);
+        }
+    }
+    return availableProducts;
+}
+// Función para reiniciar todos los filtros a su estado inicial
+function resetFilters() {
+    for (const filter of filters) {
+        document.getElementById(filter).selectedIndex = 0;
+    }
+    updateProducts();
+}
+
+for (const filter of filters) {
+    document.getElementById(filter).addEventListener('change', updateProducts);
+}
+// Configuración de PDF.js
+pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.9.359/pdf.worker.min.js';
+
+// Función para generar el PDF basado en los productos filtrados
+async function generatePDF() {
+    console.log("Iniciando generación de PDF");
+    const availableProducts = getAvailableProducts();
+    console.log("Productos disponibles:", availableProducts);
+
+// Determinar qué diapositivas incluir en el PDF final
+
+    const slides = [1];// Siempre incluye la primera diapositiva
+    for (const product of availableProducts) {
+        if (slideMatrix[product]) {
+            slides.push(...slideMatrix[product]);
+        }
+    }
+    slides.push(7); // siempre incluye al final el slide 7
+    const uniqueSlides = [...new Set(slides)].sort((a, b) => a - b);
+    console.log("Diapositivas a incluir:", uniqueSlides);
+
+    // Crear un input de archivo y abrirlo
+    const fileInput = document.createElement('input');
+    fileInput.type = 'file';
+    fileInput.accept = '.pdf';
+    console.log("Elemento de entrada de archivo creado");
+
+    fileInput.click();
+    console.log("Diálogo de selección de archivo abierto");
+
+    fileInput.onchange = async function() {
+        if (!fileInput.files || fileInput.files.length === 0) {
+            console.log("No se seleccionó ningún archivo");
+            alert('No se seleccionó ningún archivo.');
+            return;
+        }
+
+        const file = fileInput.files[0];
+        console.log("Archivo seleccionado:", file.name);
+
+        try {
+            console.log("Iniciando procesamiento del archivo");
+            const loadingMessage = document.createElement('div');
+            loadingMessage.textContent = 'Generando PDF...';
+            loadingMessage.className = 'fixed top-0 left-0 w-full bg-blue-500 text-white text-center p-2';
+            document.body.appendChild(loadingMessage);
+
+            const arrayBuffer = await file.arrayBuffer();
+            console.log("Archivo leído como ArrayBuffer");
+
+            const pdfDoc = await pdfjsLib.getDocument({data: arrayBuffer}).promise;
+            console.log("Documento PDF cargado, número de páginas:", pdfDoc.numPages);
+
+            const images = [];
+            let pdfWidth, pdfHeight;
+        // Procesar cada diapositiva seleccionada
+            for (const pageNum of uniqueSlides) {
+                console.log(`Procesando página ${pageNum}`);
+                if (pageNum > pdfDoc.numPages) {
+                    console.warn(`La diapositiva ${pageNum} no existe en el PDF. Omitiendo.`);
+                    continue;
+                }
+                const page = await pdfDoc.getPage(pageNum);
+                const viewport = page.getViewport({scale: 1.5});
+                
+                if (!pdfWidth || !pdfHeight) {
+                    pdfWidth = viewport.width;
+                    pdfHeight = viewport.height;
+                }
+
+                const canvas = document.createElement('canvas');
+                const context = canvas.getContext('2d');
+                canvas.height = viewport.height;
+                canvas.width = viewport.width;
+
+                await page.render({canvasContext: context, viewport: viewport}).promise;
+                images.push(canvas.toDataURL('image/jpeg', 1.0));
+                console.log(`Página ${pageNum} procesada y convertida a imagen`);
+            }
+
+            console.log("Todas las páginas procesadas, creando nuevo PDF");
+            const { jsPDF } = window.jspdf;
+            if (!jsPDF) {
+                throw new Error("jsPDF no está definido. Asegúrate de que la biblioteca se haya cargado correctamente.");
+            }
+
+             // Crear nuevo PDF
+            const pdf = new jsPDF({
+                orientation: pdfWidth > pdfHeight ? 'l' : 'p',
+                unit: 'pt',
+                format: [pdfWidth, pdfHeight]
+            });
+
+             // Añadir imágenes al nuevo PDF
+
+            for (let i = 0; i < images.length; i++) {
+                if (i > 0) pdf.addPage([pdfWidth, pdfHeight], pdfWidth > pdfHeight ? 'l' : 'p');
+                pdf.addImage(images[i], 'JPEG', 0, 0, pdfWidth, pdfHeight, null, 'FAST');
+                console.log(`Imagen ${i + 1} añadida al nuevo PDF`);
+            }
+
+            console.log("Guardando el PDF generado");
+            pdf.save('catalogo_productos.pdf');
+            
+            document.body.removeChild(loadingMessage);
+            console.log("PDF generado con éxito");
+            alert('PDF generado con éxito.');
+        } catch (error) {
+            console.error('Error detallado al generar PDF:', error);
+            alert(`Error al generar el PDF: ${error.message}. Por favor, revisa la consola para más detalles.`);
+        }
+    };
+}
+// Agregar event listeners a los botones
+document.getElementById('resetFilters').addEventListener('click', resetFilters);
+document.getElementById('generatePDF').addEventListener('click', generatePDF);
+
+// Inicializar la visualización de productos
+updateProducts();
+    </script>
+</body>
+</html>
